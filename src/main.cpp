@@ -28,7 +28,7 @@
 
 // Uncomment to have some printf() status messages on the serial console.
 // ATTN: Output of NMEA2000 to serial well be changed to text format (default: Actisense)
-//#define DEBUG
+// #define DEBUG
 
 /* *********************************************************************************************
   No user-configurable stuff below
@@ -306,11 +306,74 @@ double SecondsSinceMidnight, received_SecondsSinceMidnight;
 // Set the information for other bus devices, which messages we support
 const unsigned long ReceiveMessages[] PROGMEM = {129029L, // GNSS (used for time)
                                                  126992L, // System time
+                                                 65361L,  // Seatalk: Silence Alarm
                                                  0};
 const unsigned long TransmitMessages[] PROGMEM = {128275L, // Distance Log
                                                   128259L, // Boat speed
                                                   128267L, // Depth
+                                                  65288L,  // Seatalk: Alarm
                                                   0};
+
+/// @brief Setting up PGN 65288 Message "Seatalk: Alarm"
+/// @param N2kMsg
+/// @param SID
+/// @param alarm_status   0=Alarm condition not met; 1=Alarm condition met and not silenced; 2=Alarm condition met and silenced
+/// @param alarm_id       1=Shallow Depth; 2=Boat Speed High
+/// @param alarm_group    0=Instrument; 3=Chart Plotter
+/// @param alarm_priority
+void SetN2kPGN65288(tN2kMsg &N2kMsg, unsigned char SID, uint8_t alarm_status, uint8_t alarm_id, uint8_t alarm_group, uint16_t alarm_priority)
+{
+  N2kMsg.SetPGN(65288L);
+  N2kMsg.Priority = 1;
+  N2kMsg.AddByte(alarm_status & 0x03); // 0=Alarm condition not met; 1=Alarm condition met and not silenced; 2=Alarm condition met and silenced
+  N2kMsg.AddByte(alarm_id);            // 1=Shallow Depth; 2=Boat Speed High
+  N2kMsg.AddByte(alarm_group);
+  N2kMsg.Add2ByteUInt(alarm_priority);
+}
+
+/// @brief Alias of SetN2kPGN65288
+/// @param N2kMsg
+/// @param SID
+/// @param alarm_status
+/// @param alarm_id       1=Shallow Depth; 2=Boat Speed High
+/// @param alarm_group    0=Instrument; 3=Chart Plotter
+/// @param alarm_priority
+inline void SetN2kSeatalkAlarm(tN2kMsg &N2kMsg, unsigned char SID, uint8_t alarm_status, uint8_t alarm_id, uint8_t alarm_group, uint16_t alarm_priority)
+{
+  SetN2kPGN65288(N2kMsg, SID, alarm_status, alarm_id, alarm_group, alarm_priority);
+}
+
+/// @brief Parsing the content of a "Seatalk: Silence Alarm" message - PGN 65361
+/// @param N2kMsg
+/// @param alarm_id        1=Shallow Depth; 2=Boat Speed High
+/// @param alarm_group     0=Instrument; 3=Chart Plotter
+/// @param reserved_field
+/// @return
+bool ParseN2kPGN65361(const tN2kMsg &N2kMsg, uint8_t &alarm_id, uint8_t &alarm_group, uint32_t &reserved_field)
+{
+  if (N2kMsg.PGN != 65361L)
+  {
+    return false;
+  }
+
+  int Index = 0;
+  alarm_id = N2kMsg.GetByte(Index);
+  alarm_group = N2kMsg.GetByte(Index);
+  alarm_group = N2kMsg.Get2ByteUInt(Index);
+
+  return true;
+}
+
+/// @brief Alias of parseN2kPGN65361
+/// @param N2kMsg
+/// @param alarm_id
+/// @param alarm_group
+/// @param reserved_field
+/// @return
+inline bool ParseN2kSeatalkSilenceAlarm(const tN2kMsg &N2kMsg, uint8_t &alarm_id, uint8_t &alarm_group, uint32_t &reserved_field)
+{
+  return ParseN2kPGN65361(N2kMsg, alarm_id, alarm_group, reserved_field);
+}
 
 // PGN129029 handler
 void handle_GNSS(const tN2kMsg &N2kMsg)
@@ -358,6 +421,18 @@ void handle_SystemTime(const tN2kMsg &N2kMsg)
   }
 }
 
+void handle_SeatalkSilenceAlarm(const tN2kMsg &N2kMsg)
+{
+  uint8_t alarm_id;
+  uint8_t alarm_group;
+  uint32_t reserved_field;
+
+  if (ParseN2kSeatalkSilenceAlarm(N2kMsg, alarm_id, alarm_group, reserved_field))
+  {
+
+  }
+}
+
 // Update DaysSince1970 and SecondsSinceMidnight from delta t
 void TimeUpdate()
 {
@@ -375,6 +450,7 @@ typedef struct
 tNMEA2000Handler NMEA2000Handlers[] = {
     {126992L, &handle_SystemTime},
     {129029L, &handle_GNSS},
+    {65361L, &handle_SeatalkSilenceAlarm},
     {0, 0}};
 
 // NMEA 2000 message handler
@@ -419,9 +495,9 @@ void InitNMEA2000()
   NMEA2000.SetInstallationDescription1("ClipperDuet2N2k " GIT_DESCRIBE " by Soenke J. Peters");
   NMEA2000.SetInstallationDescription2(PINDESCRIPTION);
 
-  #ifdef DEBUG
+#ifdef DEBUG
   NMEA2000.SetForwardType(tNMEA2000::fwdt_Text); // Show in clear text instead of Actisense format.
-  #endif
+#endif
   NMEA2000.SetForwardStream(&Serial);
   NMEA2000.SetMode(tNMEA2000::N2km_ListenAndNode, 32);
   NMEA2000.EnableForward(true);
