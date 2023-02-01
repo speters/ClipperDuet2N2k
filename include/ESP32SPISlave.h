@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2021 Hideaki Tai
+
 #pragma once
 #ifndef ESP32SPI_SLAVE_H
 #define ESP32SPI_SLAVE_H

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 /*
 This is loosely based on some 7segment style ideas from
 https://fakoo.de/en/siekoo.html

@@ -56,7 +56,7 @@ A power supply for the ESP32 is needed. Most ESP32 modules want either 3.3V or 5
 __ClipperDuet2N2k__ firmware needs no special setup or configuration by the user.
 
 Before real use, you should have at least once set your Clipper Duet into configuration mode (hold Illum key depressed while powering on) and confirm all the adjustments (keel offset, gain threshold, paddle wheel calibration value, units).
-__ClipperDuet2N2k__ will read those settings and save it into its non-volatile memory, so that settings like the keel offset is known to the unit and can be sent in NMEA2000 sentences.
+__ClipperDuet2N2k__ will read those settings and save it into its non-volatile memory, so that settings like the keel offset are known to the unit and can be sent in NMEA2000 sentences.
 
 __Without this configuration step, a keel offset of -3m is used as default for safety.__
 
@@ -73,7 +73,7 @@ The keel offset configured in your Clipper Duet is sent as a negative offset in 
 
 Beware that the update rate of the Clipper Duet and the small delay during data preparation adds up to the display delays on your frontend device. Also there are some bad implementations by some manufactures who preferred nice rolling values over fast update rates.
 
-The trip and total distance log are sent in one NMEA2000 sentence. When showing the trip value, the trip distance and the last known total log are sent. When showing the total log, the trip and total values are sent only if they have been displayed less than 60s apart. If a the unit has read a system time/GNSS time from the NMEA2000 bus, this time is used to form a timestamp for the distance log sentence.
+The trip and total distance log are sent in one NMEA2000 sentence. When showing the trip value, the trip distance and the last known total log are sent. When showing the total log, the trip and total values are sent only if they have been displayed less than 60s apart. If a the unit has read a system time/GNSS time (PGN 126992, 129029) from the NMEA2000 bus, this time is used to form a timestamp for the distance log sentence.
 
 Configuration and calibration is done as usual by manually adjusting the settings via the buttons on the NASA Clipper Duet. Setting changes in the Clipper Duet are read by the __ClipperDuet2N2k__ (see "First start").
 

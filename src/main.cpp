@@ -6,6 +6,8 @@
   and converts it to useful values to be send over the NMEA2000 network.
 */
 
+// SPDX-License-Identifier: MIT
+
 /*
  Timeout in s for Trip and Total distance
  if more than this time has elapsed between the display of the two values,
