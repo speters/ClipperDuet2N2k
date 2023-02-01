@@ -91,7 +91,7 @@ The segment/com lines have been explored by writing a test software which make t
 
 The ESP32 reads the communications of the PIC microcontroller with the HT1621. The PIC periodically sends data for the entire display memory of the LCD controller.
 
-__ClipperDuet2N2k__ EPS32 maps this display memory back to the 5 digits plus some symbols. The digits and symbols are then used to deduce the values, units and state of the Clipper Duet. The assembled data is then translated into standard NMEA2000 sentences and written to the CAN bus.
+__ClipperDuet2N2k__ ESP32 maps this display memory back to the 5 digits plus some symbols. The digits and symbols are then used to deduce the values, units and state of the Clipper Duet. The assembled data is then translated into standard NMEA2000 sentences and written to the CAN bus.
 
 Shallow depth and speed alarm settings are read by the __ClipperDuet2N2k__, but as there is no well-known NMEA2000 PGN, no sentence with these values is sent.
 
