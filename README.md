@@ -1,6 +1,7 @@
-# NASA Clipper Duet Echo Sounder/Log to NMEA2000 converter (__ClipperDuet2N2k__) :sailboat: :hammer_and_wrench:
+# NASA Clipper Duet Echo Sounder/Log to NMEA2000 converter (__ClipperDuet2N2k__) :sailboat: :hammer_and_wrench
 
 ## Intro
+
 __ClipperDuet2N2k__ project is about retrofitting[^1] a NASAmarine Clipper Duet echo sounder/log with NMEA2000.
 
 It makes use of an ESP32 equipped with a CAN transceiver to read the LCD controller's data and recompute usable values for water depth, speed and distance logs to be send into the NMEA2000 CAN network.
@@ -11,20 +12,24 @@ See my chaotic test setup[^2] below:
 ## HOWTO
 
 ### Prerequisites
+
 Hardware needed:
- * [NASAmarine Clipper Duet](http://web.archive.org/web/20230130133611/https://www.nasamarine.com//wp-content/uploads/2015/12/Clipper-Duet.pdf) (in case there are different versions arund: the LCD controller must be an HT1621 and the LCD segment/com layout must be the same as in this implementation)
- * ESP32 module with a CAN transceiver[^3]
- * a power supply module for the ESP32 which runs with the ca. 12V of your boat. It should deliver either 5V or 3.3V depending on your ESP32 module
+
+* [NASAmarine Clipper Duet](http://web.archive.org/web/20230130133611/https://www.nasamarine.com//wp-content/uploads/2015/12/Clipper-Duet.pdf) (in case there are different versions arund: the LCD controller must be an HT1621 and the LCD segment/com layout must be the same as in this implementation)
+* ESP32 module with a CAN transceiver[^3]
+* a power supply module for the ESP32 which runs with the ca. 12V of your boat. It should deliver either 5V or 3.3V depending on your ESP32 module
 
 Software needed:
- * __ClipperDuet2N2k__ firmware (maybe as an already compiled binary ready for upload)
- * some means of uploading the firmware to the ESP32
+
+* __ClipperDuet2N2k__ firmware (maybe as an already compiled binary ready for upload)
+* some means of uploading the firmware to the ESP32
 
 The firmware is written for the ESP32. It makes use of PlatformIO with the Arduino framework.
 
 Additional libraries:
- * [NMEA2000 library by Timo Lappalainen](https://github.com/ttlappalainen/NMEA2000/) 
- * [ESP32SPISlave library by Hideaki Tai](https://github.com/hideakitai/ESP32SPISlave) (this one is included for convenience, as it is not rolled out via PlatformIO)
+
+* [NMEA2000 library by Timo Lappalainen](https://github.com/ttlappalainen/NMEA2000/)
+* [ESP32SPISlave library by Hideaki Tai](https://github.com/hideakitai/ESP32SPISlave) (this one is included for convenience, as it is not rolled out via PlatformIO)
 
 ### Clipper Duet modification
 
@@ -39,13 +44,13 @@ It is unknown if there are different hardware revisions of the Clipper Duet arou
 
 The firmware expects these connections (Arduino style pin numbering):
 
- * GPIO_NUM_13 (SPI MOSI) to HT1621 DATA which is on pin 4 of the PIC
- * GPIO_NUM_12 (SPI MISO) stays unconnected
- * GPIO_NUM_14 (SPI CLK) to HT1621 WR which is pin 5 of the PIC
- * GPIO_NUM_27 (SPI CS) to HT1621 CS which is pin 7 on the PIC
- * GND of the ESP32 is connected to GND on the Clipper Duet, this can be found e.g. on pin 8 of the PIC
- * CAN transceiver TX pin is on GPIO_NUM_5 of the ESP32
- * CAN transceiver RX pin is on GPIO_NUM_4 of the ESP32
+* GPIO_NUM_13 (SPI MOSI) to HT1621 DATA which is on pin 4 of the PIC
+* GPIO_NUM_12 (SPI MISO) stays unconnected
+* GPIO_NUM_14 (SPI CLK) to HT1621 WR which is pin 5 of the PIC
+* GPIO_NUM_27 (SPI CS) to HT1621 CS which is pin 7 on the PIC
+* GND of the ESP32 is connected to GND on the Clipper Duet, this can be found e.g. on pin 8 of the PIC
+* CAN transceiver TX pin is on GPIO_NUM_5 of the ESP32
+* CAN transceiver RX pin is on GPIO_NUM_4 of the ESP32
 
 The ESP32 is experienced to have 5V tolerance on the GPIO pins above. Considering the cheapness of the ESP32 modules, there is no level converter used.
 
@@ -101,9 +106,10 @@ Versioning scheme is major.minor.patch
 Version data is included via the `version.py` pre:-script run by PlatformUIO
 
 The N2K software version is shown as
-  * major.minor.patch.0 for tags
-  * major.minor.patch.num_of_additional_commits for commits
-  * 0.major.minor.patch for a "dirty" build
+
+* major.minor.patch.0 for tags
+* major.minor.patch.num_of_additional_commits for commits
+* 0.major.minor.patch for a "dirty" build
 
 N2k software version also shows build date.
 The format seems to be the one which is used in Timo Lappalainen's library, so I'll stick to it.
@@ -118,6 +124,7 @@ __ClipperDuet2N2k__ accounts for this and tries to keep things simple.
 Following this KISS principle, the hardware was just thrown together using modules which were lying around.
 
 ## Footnotes
+
 [^1]: I reverse-engineered the schematics and partially recreated the PCBs in KiCAD. Link will follow once I uploaded this.
 
 [^2]: The test setup consisted of a NASA Clipper Duet with an ESP32 devboard connected via a CAN transceiver to a marine MFD (in this case a Raymarine St70, which btw. is not recommended due to a number of bugs).
