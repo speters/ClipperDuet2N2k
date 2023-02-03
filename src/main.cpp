@@ -8,6 +8,8 @@
 
 // SPDX-License-Identifier: MIT
 
+// TODO: Refactoring
+
 /*
  Timeout in s for Trip and Total distance
  if more than this time has elapsed between the display of the two values,
@@ -334,7 +336,7 @@ void SetN2kPGN65288(tN2kMsg &N2kMsg, unsigned char SID, uint8_t alarm_status, ui
 /// @brief Alias of SetN2kPGN65288
 /// @param N2kMsg
 /// @param SID
-/// @param alarm_status
+/// @param alarm_status   0=Alarm condition not met; 1=Alarm condition met and not silenced; 2=Alarm condition met and silenced
 /// @param alarm_id       1=Shallow Depth; 2=Boat Speed High
 /// @param alarm_group    0=Instrument; 3=Chart Plotter
 /// @param alarm_priority
@@ -429,7 +431,15 @@ void handle_SeatalkSilenceAlarm(const tN2kMsg &N2kMsg)
 
   if (ParseN2kSeatalkSilenceAlarm(N2kMsg, alarm_id, alarm_group, reserved_field))
   {
-
+    if (alarm_group == 0) // 0=Instrument
+    {
+      if (alarm_id == 1) // Shallow Depth
+      {
+      }
+      else if (alarm_id == 2) // Boat Speed High
+      {
+      }
+    }
   }
 }
 
@@ -523,6 +533,8 @@ void setup()
 
   Serial.begin(115200);
   InitNMEA2000();
+  
+  printf("\n\nClipperDuet2N2k %s\n\n", GIT_DESCRIBE);
 
   slave.setDataMode(SPI_MODE3);
   slave.begin(HSPI, PIN_HTCLK, PIN_HTDATAOUT, PIN_HTDATA, PIN_HTCS);
