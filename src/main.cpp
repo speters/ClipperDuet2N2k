@@ -131,7 +131,6 @@ uint8_t spi_slave_rx_buf[BUFFER_SIZE];
 #define mkinfo2(buf) (i2_rowadot(buf) | i2_rowbdot(buf) | i2_bell(buf) | i2_line(buf) | i2_depthft(buf) | i2_depthm(buf))
 
 uint8_t digit0, digit1, digit2, digit3, digit4, digit5, digit6, info1, info2;
-double rowa = 0.0;
 
 /*
  Character representation of the LCD memory
