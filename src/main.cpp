@@ -78,7 +78,6 @@ ESP32SPISlave slave;
 
 // TODO: adjust buffer size
 static constexpr uint32_t BUFFER_SIZE{36};
-uint8_t spi_slave_tx_buf[BUFFER_SIZE];
 uint8_t spi_slave_rx_buf[BUFFER_SIZE];
 
 // receive buffer contains 3 command bits followed by 6 address bits, then lcd memory follows
@@ -539,8 +538,7 @@ void setup()
   slave.setDataMode(SPI_MODE3);
   slave.begin(HSPI, PIN_HTCLK, PIN_HTDATAOUT, PIN_HTDATA, PIN_HTCS);
 
-  // clear buffers
-  memset(spi_slave_tx_buf, 0, BUFFER_SIZE);
+  // clear buffer
   memset(spi_slave_rx_buf, 0, BUFFER_SIZE);
 }
 
@@ -564,7 +562,7 @@ void loop()
   // if there is no transaction in queue, add transaction
   if (slave.remained() == 0)
   {
-    slave.queue(spi_slave_rx_buf, spi_slave_tx_buf, BUFFER_SIZE);
+    slave.queue(spi_slave_rx_buf, BUFFER_SIZE);
   }
 
   while (slave.available())
