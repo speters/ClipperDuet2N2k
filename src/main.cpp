@@ -20,8 +20,8 @@
 // This is a positive value
 #define SAFE_OFFSET 3
 
-#define PIN_HTDATA GPIO_NUM_13    // HT1621 DATA is SPI MOSI on our ESP32 SPI Slave implementation
-#define PIN_HTDATAOUT GPIO_NUM_12 // unused, but must a usable pin for SPI MISO
+#define PIN_HTDATA GPIO_NUM_12    // HT1621 DATA is SPI MOSI on our ESP32 SPI Slave implementation
+#define PIN_HTDATAOUT GPIO_NUM_13 // unused, but must a usable pin for SPI MISO
 #define PIN_HTCLK GPIO_NUM_14     // HT1621 WR is SPI Clk on our ESP32 SPI Slave implementation
 #define PIN_HTCS GPIO_NUM_27      // HT1621 CS is SPI CS on our ESP32 SPI Slave implementation
 
@@ -30,7 +30,7 @@
 
 // Uncomment to have some printf() status messages on the serial console.
 // ATTN: Output of NMEA2000 to serial well be changed to text format (default: Actisense)
-// #define DEBUG
+#define DEBUG
 
 /* *********************************************************************************************
   No user-configurable stuff below
