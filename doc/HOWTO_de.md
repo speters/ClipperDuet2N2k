@@ -85,7 +85,7 @@ Ggf. Ecken am Gehäuse verrunden, Schamfilschutz anbringen (z.B. Klebeband, Schr
 
 Nun werden die Verbindungen mit dem ESP32-Modul, dem CAN-Transceiver und ggf. dem Spannungsversorgungsmodul hergestellt:
 
-![Verbindung Clipper Duet mit ESP32 und Modulen](connections.jpg)
+![Verbindung Clipper Duet mit ESP32 und Modulen](connections.png)
 
 Es wird empfohlen, das ganze bootsgerecht aufzubauen, also mindestens in einem Gehäuse zu befestigen. [^3]
 
