@@ -44,8 +44,8 @@ It is unknown if there are different hardware revisions of the Clipper Duet arou
 
 The firmware expects these connections (Arduino style pin numbering):
 
-* GPIO_NUM_13 (SPI MOSI) to HT1621 DATA which is on pin 4 of the PIC
-* GPIO_NUM_12 (SPI MISO) stays unconnected
+* GPIO_NUM_12 (SPI MOSI) to HT1621 DATA which is on pin 4 of the PIC
+* GPIO_NUM_13 (SPI MISO) stays unconnected
 * GPIO_NUM_14 (SPI CLK) to HT1621 WR which is pin 5 of the PIC
 * GPIO_NUM_27 (SPI CS) to HT1621 CS which is pin 7 on the PIC
 * GND of the ESP32 is connected to GND on the Clipper Duet, this can be found e.g. on pin 8 of the PIC
