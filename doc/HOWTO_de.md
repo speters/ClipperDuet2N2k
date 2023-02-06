@@ -106,7 +106,7 @@ Vor dem Kompilieren schauen, ob die Pindefinitionen in `main.cpp` mit der tatsä
 In der Bedienung des NASAmarine Clipper Duet ändert sich nichts.
 
 Der __ClipperDuet2N2k__  lernt die Einstellungen des Clipper-Duet.
-Deswegen sollte zur realen Betriebnahme der Clipper Duet im Konfigurationsmodus gestartet (ILLUM-Taste gedrückt beim Anschalten) und alle Einstellungen einmal bestätigt werden.
+Deswegen sollte für den realen Betrieb der Clipper Duet mindestens einmal im Konfigurationsmodus gestartet (ILLUM-Taste gedrückt beim Anschalten) und alle Einstellungen einmal bestätigt werden.
 
 Ohne dieses Anlernen nimmt __ClipperDuet2N2k__ zur Sicherheit einen Kiel-Offset von 3m an.
 
