@@ -10,7 +10,7 @@ The cheapest ESP32 board I had laying around was used, this one even did not com
 
 The USB port is only for development purposes. It is moved to the edge so that removal of LCD is not needed.
 
-![modded pcb1 front with ESP32 board](sp_clipperduet2n2k_pcb1_front.jpg)
+![modded pcb1 front with ESP32 board](sp_clipperduet2n2k_pcb1_back.jpg)
 
 On the back of the PCB there is a L7805 linear voltage regulator. The smaller one on the front side was removed. This allows to power both Clipper and ESP32 stuff from one regulator. As this is a cheap hack, an old 78L05 was good enough.
 
