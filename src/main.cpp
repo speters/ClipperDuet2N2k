@@ -20,11 +20,13 @@
 // This is a positive value
 #define SAFE_OFFSET 3
 
+// Pin mappings for LCD data lines to SPI pins of the ESP32
 #define PIN_HTDATA GPIO_NUM_12    // HT1621 DATA is SPI MOSI on our ESP32 SPI Slave implementation
 #define PIN_HTDATAOUT GPIO_NUM_13 // unused, but must a usable pin for SPI MISO
 #define PIN_HTCLK GPIO_NUM_14     // HT1621 WR is SPI Clk on our ESP32 SPI Slave implementation
 #define PIN_HTCS GPIO_NUM_27      // HT1621 CS is SPI CS on our ESP32 SPI Slave implementation
 
+// Pins where the CAN bus transceiver is attached
 #define ESP32_CAN_TX_PIN GPIO_NUM_5
 #define ESP32_CAN_RX_PIN GPIO_NUM_4
 
