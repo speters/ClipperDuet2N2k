@@ -1,4 +1,4 @@
-# __ClipperDuet2N2k__
+# __ClipperDuet2N2k__ - Clipper Duet NMEA2000 Erweiterung
 
 ## Vorwort
 
@@ -20,13 +20,13 @@ Diese Werte werden dann in die Basiseinheiten der N2k Daten für Tiefe, Geschwin
 
 Für die Erweiterung um N2k werden benötigt:
 
-  * NASAmarine Clipper Duet in einer Hardwareversion, die der abgebildeten entspricht
-  * ESP32 Devkit o.ä.
-  * CAN-Transceiver-Modul, idealerweise mit 3,3V Betriebsspannung (z.B. SN64VD231)
-  * Spannungsregler-Modul 12V auf 5V [^2]
-  * ein wenig Schaltlitze, um die Verbindungen nach aussen zu führen
-  * Lötequipment
-  * Kreuz-Schraubendreher PH1
+* NASAmarine Clipper Duet in einer Hardwareversion, die der abgebildeten entspricht
+* ESP32 Devkit o.ä.
+* CAN-Transceiver-Modul, idealerweise mit 3,3V Betriebsspannung (z.B. SN64VD231)
+* Spannungsregler-Modul 12V auf 5V [^2]
+* ein wenig Schaltlitze, um die Verbindungen nach aussen zu führen
+* Lötequipment
+* Kreuz-Schraubendreher PH1
 
  Aufgrund der berichteten 5V-Toleranz der IO-Pins des ESP32 wird (auch im Hinblick auf den geringen Preis) auf Level-Konverter zur Spannungsanpassung verzichtet.
 
@@ -57,11 +57,12 @@ Pin 1 befindet sich auf dem folgenden Foto links oben.
 An Pins 4, 5, 7 und 8 werden Litzen - oder wie hier - Pinheader für "Dupont"-Verbinder angelötet.
 
 Pinbelegung am PIC:
- * (ungenutzt) 1: 5V
- * 4: Data (als "SPI MOSI" an GPIO_12 des ESP32-Boards)
- * 5: Clock ((als "SPI CLK" an GPIO_14 des ESP32-Boards))
- * 7: Chip-Select ((als "SPI CS" an GPIO_27 des ESP32-Boards))
- * 8: Ground (an GND vom ESP32-Board), liegt bei Verwendung eines Pinheaders praktisch
+
+* (ungenutzt) 1: 5V
+* 4: Data (als "SPI MOSI" an GPIO_12 des ESP32-Boards)
+* 5: Clock ((als "SPI CLK" an GPIO_14 des ESP32-Boards))
+* 7: Chip-Select ((als "SPI CS" an GPIO_27 des ESP32-Boards))
+* 8: Ground (an GND vom ESP32-Board), liegt bei Verwendung eines Pinheaders praktisch
 
 Das Klebeband verhindert das Verrutschen beim Löten.
 
@@ -113,10 +114,9 @@ __Achtung:__
 Nur angezeigt Werte werden gesendet.
 Logdaten werden zudem nur gesendet, wenn Tages- und Gesamtlog nacheinander (innerhalb 1 Minute) angezeigt wurden.
 
-## TLDR;
+## TLDR
 
 Dies ist ein Selbstbauprojekt, welches ein gewisses Maß an Kenntnis der Materie voraussetzt.
-
 
 [^1]: "echte" NMEA2000 Kompatibilität erfordert eine Zertifizierung, die hier vorgestellte Schnittstelle ist interoperabel, sie ist weiterhin hier im Text als "N2k" abgeküzt
 
