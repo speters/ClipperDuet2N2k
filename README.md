@@ -1,4 +1,6 @@
-# NASA Clipper Duet Echo Sounder/Log to NMEA2000 converter (__ClipperDuet2N2k__) :sailboat: :hammer_and_wrench
+# NASA Clipper Duet Echo Sounder/Log to NMEA2000 converter (__ClipperDuet2N2k__) :sailboat: :hammer_and_wrench:
+
+(:germany: [German HOWTO](doc/HOWTO_de.md))
 
 ## Intro
 
