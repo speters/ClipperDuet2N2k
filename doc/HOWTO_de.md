@@ -22,7 +22,7 @@ Für die Erweiterung um N2k werden benötigt:
 
 * NASAmarine Clipper Duet in einer Hardwareversion, die der abgebildeten entspricht
 * ESP32 Devkit o.ä.
-* CAN-Transceiver-Modul, idealerweise mit 3,3V Betriebsspannung (z.B. SN64VD231)
+* CAN-Transceiver-Modul, idealerweise mit 3,3V Betriebsspannung (z.B. SN65HVD231)
 * Spannungsregler-Modul 12V auf 5V [^2]
 * ein wenig Schaltlitze, um die Verbindungen nach aussen zu führen
 * Lötequipment
