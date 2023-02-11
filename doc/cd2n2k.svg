@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="280mm"
+   height="80mm"
+   viewBox="0 0 280 80"
+   version="1.1"
+   id="svg2760"
+   xml:space="preserve"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+     id="defs2757" /><g
+     id="layer1"><g
+       id="g4396"
+       transform="translate(0,6.5836241)"
+       style="fill:#144b84;fill-opacity:1"><path
+         id="S23_C1"
+         style="fill:#144b84;fill-opacity:1;stroke:none;stroke-width:0.255845"
+         d="m 39.482356,36.229699 v 0.48441 h -0.700382 v 3.754777 H 279.99824 V 36.714109 H 39.599395 l -0.116086,-0.48441 z m -39.37844421,0.123019 0.0338216,4.235233 8.45770985,0.06817 -0.033873,-4.34375 z" /><path
+         style="fill:#144b84;fill-opacity:1;stroke:none;stroke-width:0.255845"
+         d="m 23.088001,19.291684 c -0.88063,0.24421 -1.621824,0.248716 -2.119658,0.439623 -1.470142,0.347533 -2.184697,1.01699 -3.385073,1.937202 -4.345759,4.190631 -4.593696,8.677017 -3.570746,12.866602 0.565956,0.903966 0.626607,1.756816 0.563198,2.30093 -0.53415,1.043076 -5.795946,10.34171 -7.3329735,13.200202 11.6280125,-0.236022 12.6291005,-0.301961 13.4664135,0.260334 1.855986,1.246382 -0.07827,3.203177 -0.638959,4.356072 -1.408755,2.897987 0.394484,5.965888 3.543951,6.038409 3.149468,0.07252 5.291811,-2.719987 3.810641,-5.931833 -0.574136,-1.219518 -1.949245,-2.202866 -1.501271,-3.738438 0.329294,-1.129901 1.915134,-0.915539 2.812595,-0.962781 1.383962,-0.167335 11.733862,-0.251832 11.733862,-0.251832 0,0 -0.793972,-1.957014 -1.101069,-2.555264 -1.324179,-2.578279 -3.018186,-5.033039 -4.517814,-7.509589 -0.523433,-0.863466 -2.241737,-2.906474 -1.442512,-3.874074 0.101635,-0.748417 0.834289,-1.949377 1.168121,-2.906486 0.844177,-4.61112 -2.172844,-10.687521 -5.528094,-12.28661 -1.434624,-0.884231 -3.081338,-1.123215 -4.958478,-1.39078"
+         id="S4_C1"><title
+           id="title2516">ALARM</title></path></g><text
+       xml:space="preserve"
+       style="font-weight:bold;font-size:8.46667px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro Bold';text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:2.605;stroke-linecap:round;stroke-linejoin:round;paint-order:stroke fill markers"
+       x="63.533127"
+       y="19.563181"
+       id="text4452"><tspan
+         id="tspan4450"
+         style="stroke-width:2.605;fill:#000000;stroke:none"
+         x="63.533127"
+         y="19.563181" /></text><text
+       xml:space="preserve"
+       style="font-weight:bold;font-size:26.3976px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro Bold';text-align:center;text-anchor:middle;fill:#144b84;stroke:none;stroke-width:8.12194;stroke-linecap:round;stroke-linejoin:round;paint-order:stroke fill markers;fill-opacity:1"
+       x="158.06073"
+       y="36.293526"
+       id="text4780"><tspan
+         id="tspan4778"
+         style="stroke-width:8.12194;fill:#144b84;fill-opacity:1"
+         x="158.06073"
+         y="36.293526">ClipperDuet2N2k</tspan></text></g></svg>
