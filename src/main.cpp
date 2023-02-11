@@ -82,55 +82,59 @@ ESP32SPISlave slave;
 static constexpr uint32_t BUFFER_SIZE{36};
 uint8_t spi_slave_rx_buf[BUFFER_SIZE];
 
+
 // receive buffer contains 3 command bits followed by 6 address bits, then lcd memory follows
-#define SHIFT_BY (3 + 6)
-#define segdata(seg, com, buf) ((buf[(seg * 4 + com + SHIFT_BY) / 8] >> (7 - ((seg * 4 + com + SHIFT_BY) % 8))) & 1)
+inline uint8_t segdata(uint8_t seg, uint8_t com, uint8_t *buf)
+{
+  const uint8_t shift_by = 3 + 6;
+  return ((buf[(seg * 4 + com + shift_by) / 8] >> (7 - ((seg * 4 + com + shift_by) % 8))) & 1);
+}
 
 // Bit order 7..0: (dot) g f e d c b a
-#define mkdigit0(buf) (segdata(13, 1, buf) << 6) | (segdata(14, 0, buf) << 5) | (segdata(14, 1, buf) << 4) | \
-                          (segdata(15, 1, buf) << 3) | (segdata(12, 1, buf) << 2) | (segdata(12, 0, buf) << 1) | (segdata(13, 0, buf))
+inline uint8_t mkdigit0(uint8_t* buf) {return (segdata(13, 1, buf) << 6) | (segdata(14, 0, buf) << 5) | (segdata(14, 1, buf) << 4) | 
+                          (segdata(15, 1, buf) << 3) | (segdata(12, 1, buf) << 2) | (segdata(12, 0, buf) << 1) | (segdata(13, 0, buf));}
 
-#define mkdigit1(buf) (segdata(11, 1, buf) << 6) | (segdata(15, 0, buf) << 5) | (segdata(7, 1, buf) << 4) | \
-                          (segdata(7, 0, buf) << 3) | (segdata(10, 1, buf) << 2) | (segdata(10, 0, buf) << 1) | (segdata(11, 0, buf))
+inline uint8_t mkdigit1(uint8_t* buf) {return (segdata(11, 1, buf) << 6) | (segdata(15, 0, buf) << 5) | (segdata(7, 1, buf) << 4) |
+                          (segdata(7, 0, buf) << 3) | (segdata(10, 1, buf) << 2) | (segdata(10, 0, buf) << 1) | (segdata(11, 0, buf));}
 
-#define mkdigit2(buf) (segdata(8, 1, buf) << 6) | (segdata(9, 0, buf) << 5) | (segdata(9, 1, buf) << 4) |                              \
-                          (segdata(6, 1, buf) << 3) | (segdata(16, 1, buf) << 2) | (segdata(16, 0, buf) << 1) | (segdata(8, 0, buf)) | \
-                          (segdata(6, 0, buf) << 7)
+inline uint8_t mkdigit2(uint8_t* buf) {return (segdata(8, 1, buf) << 6) | (segdata(9, 0, buf) << 5) | (segdata(9, 1, buf) << 4) |                              \
+                          (segdata(6, 1, buf) << 3) | (segdata(16, 1, buf) << 2) | (segdata(16, 0, buf) << 1) | (segdata(8, 0, buf)) | 
+                          (segdata(6, 0, buf) << 7);}
 
-#define mkdigit3(buf) (segdata(26, 1, buf) << 6) | (segdata(25, 0, buf) << 5) | (segdata(25, 1, buf) << 4) | \
-                          (segdata(28, 1, buf) << 3) | (segdata(27, 1, buf) << 2) | (segdata(27, 0, buf) << 1) | (segdata(26, 0, buf))
+inline uint8_t mkdigit3(uint8_t* buf) {return (segdata(26, 1, buf) << 6) | (segdata(25, 0, buf) << 5) | (segdata(25, 1, buf) << 4) | 
+                          (segdata(28, 1, buf) << 3) | (segdata(27, 1, buf) << 2) | (segdata(27, 0, buf) << 1) | (segdata(26, 0, buf));}
 
-#define mkdigit4(buf) (segdata(3, 1, buf) << 6) | (segdata(4, 1, buf) << 5) | (segdata(4, 0, buf) << 4) | \
-                          (segdata(3, 0, buf) << 3) | (segdata(2, 0, buf) << 2) | (segdata(2, 1, buf) << 1) | (segdata(5, 1, buf))
+inline uint8_t mkdigit4(uint8_t* buf) {return (segdata(3, 1, buf) << 6) | (segdata(4, 1, buf) << 5) | (segdata(4, 0, buf) << 4) | 
+                          (segdata(3, 0, buf) << 3) | (segdata(2, 0, buf) << 2) | (segdata(2, 1, buf) << 1) | (segdata(5, 1, buf));}
 
-#define mkdigit5(buf) (segdata(0, 1, buf) << 6) | (segdata(1, 1, buf) << 5) | (segdata(1, 0, buf) << 4) |                               \
-                          (segdata(0, 0, buf) << 3) | (segdata(17, 0, buf) << 2) | (segdata(17, 1, buf) << 1) | (segdata(23, 1, buf)) | \
-                          (segdata(23, 0, buf) << 7)
+inline uint8_t mkdigit5(uint8_t* buf) {return (segdata(0, 1, buf) << 6) | (segdata(1, 1, buf) << 5) | (segdata(1, 0, buf) << 4) |                               \
+                          (segdata(0, 0, buf) << 3) | (segdata(17, 0, buf) << 2) | (segdata(17, 1, buf) << 1) | (segdata(23, 1, buf)) |
+                          (segdata(23, 0, buf) << 7);}
 
-#define mkdigit6(buf) (segdata(18, 1, buf) << 6) | (segdata(22, 1, buf) << 5) | (segdata(22, 0, buf) << 4) | \
-                          (segdata(18, 0, buf) << 3) | (segdata(19, 0, buf) << 2) | (segdata(19, 1, buf) << 1) | (segdata(21, 1, buf))
+inline uint8_t mkdigit6(uint8_t* buf) {return (segdata(18, 1, buf) << 6) | (segdata(22, 1, buf) << 5) | (segdata(22, 0, buf) << 4) |
+                          (segdata(18, 0, buf) << 3) | (segdata(19, 0, buf) << 2) | (segdata(19, 1, buf) << 1) | (segdata(21, 1, buf));}
 
-#define i1_trip(buf) (segdata(28, 0, buf) << 7)
-#define i1_total(buf) (segdata(29, 0, buf) << 6)
+inline uint8_t i1_trip(uint8_t* buf) {return (segdata(28, 0, buf) << 7);}
+inline uint8_t i1_total(uint8_t* buf) {return (segdata(29, 0, buf) << 6);}
 // The following one is special due to SPI implementation
-// It is not: #define i1_kts(buf) (segdata(31, 1, buf) << 5)
-#define i1_kts(buf) (buf[16] & 1)
-#define i1_mph(buf) (segdata(30, 0, buf) << 4)
-#define i1_km(buf) (segdata(30, 1, buf) << 3)
+// It is not: inline uint8_t i1_kts(uint8_t* buf) {return (segdata(31, 1, buf) << 5);}
+inline uint8_t i1_kts(uint8_t* buf) {return (buf[16] & 1);}
+inline uint8_t i1_mph(uint8_t* buf) {return (segdata(30, 0, buf) << 4);}
+inline uint8_t i1_km(uint8_t* buf) {return (segdata(30, 1, buf) << 3);}
 // The following one is special due to SPI implementation
-// It is not: #define i1_ph(buf) (segdata(31, 0, buf) << 2)
-#define i1_ph(buf) ((buf[16] >> 1) & 1)
-#define i1_n(buf) (segdata(29, 1, buf) << 1)
-#define i1_miles(buf) (segdata(24, 1, buf))
-#define mkinfo1(buf) (i1_trip(buf) | i1_total(buf) | i1_kts(buf) | i1_mph(buf) | i1_km(buf) | i1_ph(buf) | i1_n(buf) | i1_miles(buf))
+// It is not: inline uint8_t i1_ph(uint8_t* buf) {return (segdata(31, 0, buf) << 2);}
+inline uint8_t i1_ph(uint8_t* buf) {return ((buf[16] >> 1) & 1);}
+inline uint8_t i1_n(uint8_t* buf) {return (segdata(29, 1, buf) << 1);}
+inline uint8_t i1_miles(uint8_t* buf) {return (segdata(24, 1, buf));}
+inline uint8_t mkinfo1(uint8_t* buf) {return (i1_trip(buf) | i1_total(buf) | i1_kts(buf) | i1_mph(buf) | i1_km(buf) | i1_ph(buf) | i1_n(buf) | i1_miles(buf));}
 
-#define i2_rowadot(buf) (segdata(6, 0, buf) << 5)
-#define i2_rowbdot(buf) (segdata(23, 0, buf) << 4)
-#define i2_bell(buf) (segdata(5, 0, buf) << 3)
-#define i2_line(buf) (segdata(24, 0, buf) << 2)
-#define i2_depthft(buf) (segdata(20, 1, buf) << 1)
-#define i2_depthm(buf) (segdata(20, 0, buf))
-#define mkinfo2(buf) (i2_rowadot(buf) | i2_rowbdot(buf) | i2_bell(buf) | i2_line(buf) | i2_depthft(buf) | i2_depthm(buf))
+inline uint8_t i2_rowadot(uint8_t* buf) {return (segdata(6, 0, buf) << 5);}
+inline uint8_t i2_rowbdot(uint8_t* buf) {return (segdata(23, 0, buf) << 4);}
+inline uint8_t i2_bell(uint8_t* buf) {return (segdata(5, 0, buf) << 3);}
+inline uint8_t i2_line(uint8_t* buf) {return (segdata(24, 0, buf) << 2);}
+inline uint8_t i2_depthft(uint8_t* buf) {return (segdata(20, 1, buf) << 1);}
+inline uint8_t i2_depthm(uint8_t* buf) {return (segdata(20, 0, buf));}
+inline uint8_t mkinfo2(uint8_t* buf) {return (i2_rowadot(buf) | i2_rowbdot(buf) | i2_bell(buf) | i2_line(buf) | i2_depthft(buf) | i2_depthm(buf));}
 
 uint8_t digit0, digit1, digit2, digit3, digit4, digit5, digit6, info1, info2;
 
@@ -553,6 +557,7 @@ const uint32_t BF_SPEED_ALARM = 1 << 4;
 
 uint32_t queue_save = 0;
 tN2kMsg N2kMsg;
+
 void loop()
 {
   now = millis();

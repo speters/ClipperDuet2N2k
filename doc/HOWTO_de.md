@@ -90,6 +90,11 @@ Nun werden die Verbindungen mit dem ESP32-Modul, dem CAN-Transceiver und ggf. de
 
 Es wird empfohlen, das ganze bootsgerecht aufzubauen, also mindestens in einem Gehäuse zu befestigen. [^3]
 
+__Achtung:__
+Manche CAN-Transceiver-Module haben fest eingelötete oder per Steckbrücke zu konfigurierende Abschlusswiderstände. 
+Auf die korrekte Terminierung des NMEA2000 CAN-Bus ist zu achten!
+
+
 ### Firmware
 
 Die Software aus dem Repository muss noch kompiliert und auf den ESP32 geladen werden.

@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MIT
 import subprocess
 import datetime
+import os
 
 Import("env")
 
@@ -34,11 +35,19 @@ def get_firmware_specifier_build_flag():
 
     n2kv = t + "\ \(" + d + "\)"
 
+    # TODO:  env.StringifyMacro()
     build_flag = "-D N2K_SOFTWARE_VERSION=\\\"" + n2kv + "\\\" -D GIT_DESCRIBE=\\\"" + g + "\\\""
     print ("Firmware Revision: " + t)
     print ("git Describe: " + g)
     return (build_flag)
 
+def before_upload(source, target, env):
+    # killall minicom
+    if (os.environ.get("USER")=="soenke"):
+        subprocess.run(["killall", "-u", os.environ.get("USER"), "minicom"], stdout=subprocess.PIPE, text=True)
+
 env.Append(
     BUILD_FLAGS=[get_firmware_specifier_build_flag()]
 )
+
+#env.AddPreAction("upload", before_upload)
