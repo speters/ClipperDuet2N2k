@@ -44,10 +44,11 @@ def get_firmware_specifier_build_flag():
 def before_upload(source, target, env):
     # killall minicom
     if (os.environ.get("USER")=="soenke"):
+        print("killall minicom")
         subprocess.run(["killall", "-u", os.environ.get("USER"), "minicom"], stdout=subprocess.PIPE, text=True)
 
 env.Append(
     BUILD_FLAGS=[get_firmware_specifier_build_flag()]
 )
 
-#env.AddPreAction("upload", before_upload)
+env.AddPreAction("upload", before_upload)

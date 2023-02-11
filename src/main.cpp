@@ -64,6 +64,14 @@
 
 #include <Arduino.h>
 #include <Preferences.h>
+#include <Update.h>
+
+#include <WiFi.h>
+#include <DNSServer.h>
+#include <ESPmDNS.h>
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <AsyncElegantOTA.h>
 
 // See https://github.com/ttlappalainen/NMEA2000/
 #include <NMEA2000_CAN.h> // This will automatically choose right CAN library and create suitable NMEA2000 object
@@ -82,7 +90,6 @@ ESP32SPISlave slave;
 static constexpr uint32_t BUFFER_SIZE{36};
 uint8_t spi_slave_rx_buf[BUFFER_SIZE];
 
-
 // receive buffer contains 3 command bits followed by 6 address bits, then lcd memory follows
 inline uint8_t segdata(uint8_t seg, uint8_t com, uint8_t *buf)
 {
@@ -91,50 +98,50 @@ inline uint8_t segdata(uint8_t seg, uint8_t com, uint8_t *buf)
 }
 
 // Bit order 7..0: (dot) g f e d c b a
-inline uint8_t mkdigit0(uint8_t* buf) {return (segdata(13, 1, buf) << 6) | (segdata(14, 0, buf) << 5) | (segdata(14, 1, buf) << 4) | 
-                          (segdata(15, 1, buf) << 3) | (segdata(12, 1, buf) << 2) | (segdata(12, 0, buf) << 1) | (segdata(13, 0, buf));}
+inline uint8_t mkdigit0(uint8_t *buf) { return (segdata(13, 1, buf) << 6) | (segdata(14, 0, buf) << 5) | (segdata(14, 1, buf) << 4) |
+                                               (segdata(15, 1, buf) << 3) | (segdata(12, 1, buf) << 2) | (segdata(12, 0, buf) << 1) | (segdata(13, 0, buf)); }
 
-inline uint8_t mkdigit1(uint8_t* buf) {return (segdata(11, 1, buf) << 6) | (segdata(15, 0, buf) << 5) | (segdata(7, 1, buf) << 4) |
-                          (segdata(7, 0, buf) << 3) | (segdata(10, 1, buf) << 2) | (segdata(10, 0, buf) << 1) | (segdata(11, 0, buf));}
+inline uint8_t mkdigit1(uint8_t *buf) { return (segdata(11, 1, buf) << 6) | (segdata(15, 0, buf) << 5) | (segdata(7, 1, buf) << 4) |
+                                               (segdata(7, 0, buf) << 3) | (segdata(10, 1, buf) << 2) | (segdata(10, 0, buf) << 1) | (segdata(11, 0, buf)); }
 
-inline uint8_t mkdigit2(uint8_t* buf) {return (segdata(8, 1, buf) << 6) | (segdata(9, 0, buf) << 5) | (segdata(9, 1, buf) << 4) |                              \
-                          (segdata(6, 1, buf) << 3) | (segdata(16, 1, buf) << 2) | (segdata(16, 0, buf) << 1) | (segdata(8, 0, buf)) | 
-                          (segdata(6, 0, buf) << 7);}
+inline uint8_t mkdigit2(uint8_t *buf) { return (segdata(8, 1, buf) << 6) | (segdata(9, 0, buf) << 5) | (segdata(9, 1, buf) << 4) |
+                                               (segdata(6, 1, buf) << 3) | (segdata(16, 1, buf) << 2) | (segdata(16, 0, buf) << 1) | (segdata(8, 0, buf)) |
+                                               (segdata(6, 0, buf) << 7); }
 
-inline uint8_t mkdigit3(uint8_t* buf) {return (segdata(26, 1, buf) << 6) | (segdata(25, 0, buf) << 5) | (segdata(25, 1, buf) << 4) | 
-                          (segdata(28, 1, buf) << 3) | (segdata(27, 1, buf) << 2) | (segdata(27, 0, buf) << 1) | (segdata(26, 0, buf));}
+inline uint8_t mkdigit3(uint8_t *buf) { return (segdata(26, 1, buf) << 6) | (segdata(25, 0, buf) << 5) | (segdata(25, 1, buf) << 4) |
+                                               (segdata(28, 1, buf) << 3) | (segdata(27, 1, buf) << 2) | (segdata(27, 0, buf) << 1) | (segdata(26, 0, buf)); }
 
-inline uint8_t mkdigit4(uint8_t* buf) {return (segdata(3, 1, buf) << 6) | (segdata(4, 1, buf) << 5) | (segdata(4, 0, buf) << 4) | 
-                          (segdata(3, 0, buf) << 3) | (segdata(2, 0, buf) << 2) | (segdata(2, 1, buf) << 1) | (segdata(5, 1, buf));}
+inline uint8_t mkdigit4(uint8_t *buf) { return (segdata(3, 1, buf) << 6) | (segdata(4, 1, buf) << 5) | (segdata(4, 0, buf) << 4) |
+                                               (segdata(3, 0, buf) << 3) | (segdata(2, 0, buf) << 2) | (segdata(2, 1, buf) << 1) | (segdata(5, 1, buf)); }
 
-inline uint8_t mkdigit5(uint8_t* buf) {return (segdata(0, 1, buf) << 6) | (segdata(1, 1, buf) << 5) | (segdata(1, 0, buf) << 4) |                               \
-                          (segdata(0, 0, buf) << 3) | (segdata(17, 0, buf) << 2) | (segdata(17, 1, buf) << 1) | (segdata(23, 1, buf)) |
-                          (segdata(23, 0, buf) << 7);}
+inline uint8_t mkdigit5(uint8_t *buf) { return (segdata(0, 1, buf) << 6) | (segdata(1, 1, buf) << 5) | (segdata(1, 0, buf) << 4) |
+                                               (segdata(0, 0, buf) << 3) | (segdata(17, 0, buf) << 2) | (segdata(17, 1, buf) << 1) | (segdata(23, 1, buf)) |
+                                               (segdata(23, 0, buf) << 7); }
 
-inline uint8_t mkdigit6(uint8_t* buf) {return (segdata(18, 1, buf) << 6) | (segdata(22, 1, buf) << 5) | (segdata(22, 0, buf) << 4) |
-                          (segdata(18, 0, buf) << 3) | (segdata(19, 0, buf) << 2) | (segdata(19, 1, buf) << 1) | (segdata(21, 1, buf));}
+inline uint8_t mkdigit6(uint8_t *buf) { return (segdata(18, 1, buf) << 6) | (segdata(22, 1, buf) << 5) | (segdata(22, 0, buf) << 4) |
+                                               (segdata(18, 0, buf) << 3) | (segdata(19, 0, buf) << 2) | (segdata(19, 1, buf) << 1) | (segdata(21, 1, buf)); }
 
-inline uint8_t i1_trip(uint8_t* buf) {return (segdata(28, 0, buf) << 7);}
-inline uint8_t i1_total(uint8_t* buf) {return (segdata(29, 0, buf) << 6);}
+inline uint8_t i1_trip(uint8_t *buf) { return (segdata(28, 0, buf) << 7); }
+inline uint8_t i1_total(uint8_t *buf) { return (segdata(29, 0, buf) << 6); }
 // The following one is special due to SPI implementation
 // It is not: inline uint8_t i1_kts(uint8_t* buf) {return (segdata(31, 1, buf) << 5);}
-inline uint8_t i1_kts(uint8_t* buf) {return (buf[16] & 1);}
-inline uint8_t i1_mph(uint8_t* buf) {return (segdata(30, 0, buf) << 4);}
-inline uint8_t i1_km(uint8_t* buf) {return (segdata(30, 1, buf) << 3);}
+inline uint8_t i1_kts(uint8_t *buf) { return (buf[16] & 1); }
+inline uint8_t i1_mph(uint8_t *buf) { return (segdata(30, 0, buf) << 4); }
+inline uint8_t i1_km(uint8_t *buf) { return (segdata(30, 1, buf) << 3); }
 // The following one is special due to SPI implementation
 // It is not: inline uint8_t i1_ph(uint8_t* buf) {return (segdata(31, 0, buf) << 2);}
-inline uint8_t i1_ph(uint8_t* buf) {return ((buf[16] >> 1) & 1);}
-inline uint8_t i1_n(uint8_t* buf) {return (segdata(29, 1, buf) << 1);}
-inline uint8_t i1_miles(uint8_t* buf) {return (segdata(24, 1, buf));}
-inline uint8_t mkinfo1(uint8_t* buf) {return (i1_trip(buf) | i1_total(buf) | i1_kts(buf) | i1_mph(buf) | i1_km(buf) | i1_ph(buf) | i1_n(buf) | i1_miles(buf));}
+inline uint8_t i1_ph(uint8_t *buf) { return ((buf[16] >> 1) & 1); }
+inline uint8_t i1_n(uint8_t *buf) { return (segdata(29, 1, buf) << 1); }
+inline uint8_t i1_miles(uint8_t *buf) { return (segdata(24, 1, buf)); }
+inline uint8_t mkinfo1(uint8_t *buf) { return (i1_trip(buf) | i1_total(buf) | i1_kts(buf) | i1_mph(buf) | i1_km(buf) | i1_ph(buf) | i1_n(buf) | i1_miles(buf)); }
 
-inline uint8_t i2_rowadot(uint8_t* buf) {return (segdata(6, 0, buf) << 5);}
-inline uint8_t i2_rowbdot(uint8_t* buf) {return (segdata(23, 0, buf) << 4);}
-inline uint8_t i2_bell(uint8_t* buf) {return (segdata(5, 0, buf) << 3);}
-inline uint8_t i2_line(uint8_t* buf) {return (segdata(24, 0, buf) << 2);}
-inline uint8_t i2_depthft(uint8_t* buf) {return (segdata(20, 1, buf) << 1);}
-inline uint8_t i2_depthm(uint8_t* buf) {return (segdata(20, 0, buf));}
-inline uint8_t mkinfo2(uint8_t* buf) {return (i2_rowadot(buf) | i2_rowbdot(buf) | i2_bell(buf) | i2_line(buf) | i2_depthft(buf) | i2_depthm(buf));}
+inline uint8_t i2_rowadot(uint8_t *buf) { return (segdata(6, 0, buf) << 5); }
+inline uint8_t i2_rowbdot(uint8_t *buf) { return (segdata(23, 0, buf) << 4); }
+inline uint8_t i2_bell(uint8_t *buf) { return (segdata(5, 0, buf) << 3); }
+inline uint8_t i2_line(uint8_t *buf) { return (segdata(24, 0, buf) << 2); }
+inline uint8_t i2_depthft(uint8_t *buf) { return (segdata(20, 1, buf) << 1); }
+inline uint8_t i2_depthm(uint8_t *buf) { return (segdata(20, 0, buf)); }
+inline uint8_t mkinfo2(uint8_t *buf) { return (i2_rowadot(buf) | i2_rowbdot(buf) | i2_bell(buf) | i2_line(buf) | i2_depthft(buf) | i2_depthm(buf)); }
 
 uint8_t digit0, digit1, digit2, digit3, digit4, digit5, digit6, info1, info2;
 
@@ -523,6 +530,31 @@ void InitNMEA2000()
   NMEA2000.Open();
 }
 
+DNSServer dnsServer;
+AsyncWebServer server(80);
+
+uint8_t wifiusage = 0;
+char ssid[33];
+
+void start_wifi()
+{
+  uint32_t SerialNumber = GetSerialNumber();
+  snprintf(ssid, 32, "ClipperDuet2N2k-%lu", (long unsigned int)SerialNumber);
+  WiFi.softAP(ssid);
+  dnsServer.start(53, "*", WiFi.softAPIP());
+  AsyncElegantOTA.begin(&server);
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+            { request->redirect("http://" + WiFi.softAPIP().toString() + "/update"); });
+  server.begin();
+
+  if (MDNS.begin("clipperduet2n2k"))
+  {
+    MDNS.addService("http", "tcp", 80);
+  }
+
+  wifiusage = 1;
+}
+
 void setup()
 {
   clipperdata.depth = N2kDoubleNA;
@@ -537,7 +569,7 @@ void setup()
 
   Serial.begin(115200);
   InitNMEA2000();
-  
+
   printf("\n\nClipperDuet2N2k %s\n\n", GIT_DESCRIBE);
 
   slave.setDataMode(SPI_MODE3);
@@ -593,9 +625,6 @@ void loop()
         {
           // Line LCD segment is displayed, so unit is not in settings mode
 
-          // Increment NMEA2000 SID
-          SID = (++SID) & 0xff;
-
           // Check if there are any values to be saved to NVM
           if (queue_save > 0)
           {
@@ -632,6 +661,16 @@ void loop()
             }
             queue_save = 0;
           }
+
+          if (wifiusage == 1 && !Update.isRunning())
+          {
+            DEBUG_PRINT("Rebooting...\n", ssid);
+            wifiusage = 0; // Useless, as we restart...
+            ESP.restart();
+          }
+
+          // Increment NMEA2000 SID
+          SID = (++SID) & 0xff;
 
           double depth = rowb2double();
           if (depth != N2kDoubleNA)
@@ -768,6 +807,12 @@ void loop()
         else
         {
           // Settings dialogues
+
+          if (wifiusage != 1)
+          {
+            start_wifi();
+            DEBUG_PRINT("Started wifi AP %s\n", ssid);
+          }
 
           if (clipperlcd.digit0 == 'W' && clipperlcd.digit1 == '(') // "u_underline Con"
           {
@@ -928,5 +973,9 @@ void loop()
   if (Serial.available())
   {
     Serial.read();
+  }
+  if (wifiusage == 1)
+  {
+    dnsServer.processNextRequest();
   }
 }
