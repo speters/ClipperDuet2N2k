@@ -17,7 +17,7 @@ See my chaotic test setup[^2] below:
 
 Hardware needed:
 
-* [NASAmarine Clipper Duet](http://web.archive.org/web/20230130133611/https://www.nasamarine.com//wp-content/uploads/2015/12/Clipper-Duet.pdf) (in case there are different versions arund: the LCD controller must be an HT1621 and the LCD segment/com layout must be the same as in this implementation)
+* [NASAmarine Clipper Duet](http://web.archive.org/web/20230130133611/https://www.nasamarine.com//wp-content/uploads/2015/12/Clipper-Duet.pdf) (in case there are different versions around: the LCD controller must be an HT1621 and the LCD segment/com layout must be the same as in this implementation)
 * ESP32 module with a CAN transceiver[^3]
 * a power supply module for the ESP32 which runs with the ca. 12V of your boat. It should deliver either 5V or 3.3V depending on your ESP32 module
 
@@ -89,7 +89,7 @@ For convenience, NMEA2000 traffic is output on the serial port in ActiSense form
 
 ### Firmware update
 
-In case the firmware was compiled with OTA firmware update possibility (`WITH_OTA` defined), __ClipperDuet2N2k__  starts a WIFI access point when the Clipper Duet is in configuration mode.
+In case the firmware was compiled with OTA firmware update capability (`WITH_OTA` defined), __ClipperDuet2N2k__  starts a WIFI access point when the Clipper Duet is in configuration mode.
 The access point will appear with a SSID _ClipperDuet2N2k_-..._.
 
 You can access the update web page via going to _clipperduet2n2k.local_ or _192.168.4.1_ in the web browser of your device connected to the _ClipperDuet2N2k-..._  access point.
