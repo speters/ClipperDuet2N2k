@@ -30,6 +30,9 @@
 #define ESP32_CAN_TX_PIN GPIO_NUM_5
 #define ESP32_CAN_RX_PIN GPIO_NUM_4
 
+// define if OTA updates via WIFI should be enabled
+#define WITH_OTA
+
 // Uncomment to have some printf() status messages on the serial console.
 // ATTN: Output of NMEA2000 to serial well be changed to text format (default: Actisense)
 #define DEBUG
@@ -64,14 +67,16 @@
 
 #include <Arduino.h>
 #include <Preferences.h>
+#ifdef WITH_OTA
 #include <Update.h>
-
 #include <WiFi.h>
 #include <DNSServer.h>
 #include <ESPmDNS.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <elegantWebpage.h>
 #include <AsyncElegantOTA.h>
+#endif
 
 // See https://github.com/ttlappalainen/NMEA2000/
 #include <NMEA2000_CAN.h> // This will automatically choose right CAN library and create suitable NMEA2000 object
@@ -530,6 +535,7 @@ void InitNMEA2000()
   NMEA2000.Open();
 }
 
+#ifdef WITH_OTA
 DNSServer dnsServer;
 AsyncWebServer server(80);
 
@@ -542,6 +548,7 @@ void start_wifi()
   snprintf(ssid, 32, "ClipperDuet2N2k-%lu", (long unsigned int)SerialNumber);
   WiFi.softAP(ssid);
   dnsServer.start(53, "*", WiFi.softAPIP());
+  AsyncElegantOTA.setID(ssid);
   AsyncElegantOTA.begin(&server);
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->redirect("http://" + WiFi.softAPIP().toString() + "/update"); });
@@ -554,6 +561,7 @@ void start_wifi()
 
   wifiusage = 1;
 }
+#endif
 
 void setup()
 {
@@ -661,14 +669,14 @@ void loop()
             }
             queue_save = 0;
           }
-
+#ifdef WITH_OTA
           if (wifiusage == 1 && !Update.isRunning())
           {
             DEBUG_PRINT("Rebooting...\n", ssid);
             wifiusage = 0; // Useless, as we restart...
             ESP.restart();
           }
-
+#endif
           // Increment NMEA2000 SID
           SID = (++SID) & 0xff;
 
@@ -807,13 +815,13 @@ void loop()
         else
         {
           // Settings dialogues
-
+#ifdef WITH_OTA
           if (wifiusage != 1)
           {
             start_wifi();
             DEBUG_PRINT("Started wifi AP %s\n", ssid);
           }
-
+#endif
           if (clipperlcd.digit0 == 'W' && clipperlcd.digit1 == '(') // "u_underline Con"
           {
             // keel offset setting confirmed
@@ -974,8 +982,10 @@ void loop()
   {
     Serial.read();
   }
+#ifdef WITH_OTA
   if (wifiusage == 1)
   {
     dnsServer.processNextRequest();
   }
+#endif
 }

@@ -32,13 +32,14 @@ Additional libraries:
 
 * [NMEA2000 library by Timo Lappalainen](https://github.com/ttlappalainen/NMEA2000/)
 * [ESP32SPISlave library by Hideaki Tai](https://github.com/hideakitai/ESP32SPISlave) (this one is included for convenience, as it is not rolled out via PlatformIO)
+* [esphome/ESPAsyncWebServer-esphome](https://github.com/esphome/ESPAsyncWebServer) and [ayushsharma82/AsyncElegantOTA](https://github.com/ayushsharma82/AsyncElegantOTA) (if compiled with OTA firmware update feature)
 
 ### Clipper Duet modification
 
 You need to attach SPI MOSI, CLK, CS and GND wires of the ESP32 to the Clipper Duet front pcb.
 
 The front pcb from the front side (just for reference):
-![showing solder connections to the ESP32 SPI pins](./doc/pcb1_connection.png)
+![showing solder connections to the ESP32 SPI pins](./doc/connections.png)
 
 It's easiest to directly solder wires to the pins of the through-hole technique PIC microcontroller _on the back side_ of the front pcb.
 
@@ -86,6 +87,18 @@ Configuration and calibration is done as usual by manually adjusting the setting
 
 For convenience, NMEA2000 traffic is output on the serial port in ActiSense format. So the __ClipperDuet2N2k__ could be also used as a NMEA2000 to (USB-)serial gateway (with or without being connected to a Clipper Duet).
 
+### Firmware update
+
+In case the firmware was compiled with OTA firmware update possibility (`WITH_OTA` defined), __ClipperDuet2N2k__  starts a WIFI access point when the Clipper Duet is in configuration mode.
+The access point will appear with a SSID _ClipperDuet2N2k_-..._.
+
+You can access the update web page via going to _clipperduet2n2k.local_ or _192.168.4.1_ in the web browser of your device connected to the _ClipperDuet2N2k-..._  access point.
+
+As soon as configuration mode is left, __ClipperDuet2N2k__ will reboot without WIFI.
+
+__Attention:__
+Make sure your settings are configured correctly after a firmware upgrade! Non-volatile-memory might have been overwritten by the update.
+
 ## Implementation insights
 
 The PIC microcontroller of the Clipper Duet tells the HT1621 LCD controller which segments should be on depending on the values to be displayed.
@@ -117,6 +130,8 @@ N2k software version also shows build date.
 The format seems to be the one which is used in Timo Lappalainen's library, so I'll stick to it.
 
 A full "git describe --allways --dirty" version string is included in the binary in NMEA2000.SetInstallationDescription1.
+
+The _elegantWebpage.h_ has been compiled from the _ui/_ folder of the _elegantOTA_ library. Logo and favicon was changed.
 
 ## Hardware Development Info
 
