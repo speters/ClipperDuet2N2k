@@ -38,7 +38,7 @@ Additional libraries:
 
 You need to attach SPI MOSI, CLK, CS and GND wires of the ESP32 to the Clipper Duet front pcb.
 
-The front pcb from the front side (just for reference):
+Connection schema:
 ![showing solder connections to the ESP32 SPI pins](./doc/connections.png)
 
 It's easiest to directly solder wires to the pins of the through-hole technique PIC microcontroller _on the back side_ of the front pcb.
