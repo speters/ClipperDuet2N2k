@@ -6,7 +6,11 @@ import os
 Import("env")
 
 def get_firmware_specifier_build_flag():
-    ret = subprocess.run(["git", "describe", "--always", "--dirty"], stdout=subprocess.PIPE, text=True)
+    try:
+        ret = subprocess.run(["git", "describe", "--always", "--dirty"], stdout=subprocess.PIPE, text=True)
+    except FileNotFoundError:
+        # git not found
+        return ("")
     g =  ret.stdout.strip()
     if g[0] == 'v':
         s = g[1:]
@@ -44,8 +48,12 @@ def get_firmware_specifier_build_flag():
 def before_upload(source, target, env):
     # killall minicom
     if (os.environ.get("USER")=="soenke"):
-        print("killall minicom")
-        subprocess.run(["killall", "-u", os.environ.get("USER"), "minicom"], stdout=subprocess.PIPE, text=True)
+        try:
+            print("killall minicom")
+            subprocess.run(["killall", "-u", os.environ.get("USER"), "minicom"], stdout=subprocess.PIPE, text=True)
+        except FileNotFoundError:
+            # killall not found
+            return
 
 env.Append(
     BUILD_FLAGS=[get_firmware_specifier_build_flag()]
