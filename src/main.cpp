@@ -13,7 +13,8 @@
 /*
  Timeout in s for Trip and Total distance
  if more than this time has elapsed between the display of the two values,
- the Trip record is considered invalid and therefore no distance log values are sent
+ the Trip record is considered invalid and therefore no distance log values are sent      Cancel changes
+
  */
 #define DISTANCE_TIMEOUT 60
 // Consider this a safe sensor to keel distance (in m) in case the offset has not been read from the device
@@ -33,9 +34,9 @@
 // define if OTA updates via WIFI should be enabled
 #define WITH_OTA
 
-// Uncomment to have some printf() status messages on the serial console.
-// ATTN: Output of NMEA2000 to serial well be changed to text format (default: Actisense)
-#define DEBUG
+// Have some printf() status messages on the serial console.
+// ATTN: Output of NMEA2000 to serial will be changed to text format (default: Actisense)
+//#define DEBUG
 
 /* *********************************************************************************************
   No user-configurable stuff below
