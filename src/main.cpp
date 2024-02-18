@@ -34,6 +34,11 @@
 // define if OTA updates via WIFI should be enabled
 #define WITH_OTA
 
+
+// This needs to be defined on "old" ESP32 platformio versions
+// TODO: spec exact versions
+// #define OLD_SPI_COMMS
+
 // Have some printf() status messages on the serial console.
 // ATTN: Output of NMEA2000 to serial will be changed to text format (default: Actisense)
 //#define DEBUG
@@ -53,7 +58,7 @@
 #endif
 
 // define for debugging communications with the HT1621 LCD controller (print raw received data, not useful for production)
-// #define DEBUG_COMMS
+//#define DEBUG_COMMS
 
 #ifdef DEBUG_COMMS
 #ifndef DEBUG
@@ -129,14 +134,21 @@ inline uint8_t mkdigit6(uint8_t *buf) { return (segdata(18, 1, buf) << 6) | (seg
 
 inline uint8_t i1_trip(uint8_t *buf) { return (segdata(28, 0, buf) << 7); }
 inline uint8_t i1_total(uint8_t *buf) { return (segdata(29, 0, buf) << 6); }
+#ifdef OLD_SPI_COMMS
 // The following one is special due to SPI implementation
-// It is not: inline uint8_t i1_kts(uint8_t* buf) {return (segdata(31, 1, buf) << 5);}
+inline uint8_t i1_kts(uint8_t *buf) { return (buf[16] & 1); }
+#else
+inline uint8_t i1_kts(uint8_t* buf) {return (segdata(31, 1, buf) << 5);}
+#endif
 inline uint8_t i1_kts(uint8_t *buf) { return (buf[16] & 1); }
 inline uint8_t i1_mph(uint8_t *buf) { return (segdata(30, 0, buf) << 4); }
 inline uint8_t i1_km(uint8_t *buf) { return (segdata(30, 1, buf) << 3); }
+#ifdef OLD_SPI_COMMS
 // The following one is special due to SPI implementation
-// It is not: inline uint8_t i1_ph(uint8_t* buf) {return (segdata(31, 0, buf) << 2);}
 inline uint8_t i1_ph(uint8_t *buf) { return ((buf[16] >> 1) & 1); }
+#else
+inline uint8_t i1_ph(uint8_t* buf) {return (segdata(31, 0, buf) << 2);}
+#endif
 inline uint8_t i1_n(uint8_t *buf) { return (segdata(29, 1, buf) << 1); }
 inline uint8_t i1_miles(uint8_t *buf) { return (segdata(24, 1, buf)); }
 inline uint8_t mkinfo1(uint8_t *buf) { return (i1_trip(buf) | i1_total(buf) | i1_kts(buf) | i1_mph(buf) | i1_km(buf) | i1_ph(buf) | i1_n(buf) | i1_miles(buf)); }
@@ -627,6 +639,8 @@ void loop()
         // a check for num == 17 and htmem_address == 0 is omitted for optimization reasons
 #ifdef DEBUG_COMMS
         printf("%d Mem: ", num);
+        // buf2clipperlcd();
+        // printf("info1 %d, info2 %d, rowa %f, rowb %f\n", clipperlcd.info1, clipperlcd.info2, rowa2double(), rowb2double());
 #else
         buf2clipperlcd();
 
