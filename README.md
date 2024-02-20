@@ -120,6 +120,12 @@ As soon as configuration mode is left, __ClipperDuet2N2k__ will reboot without W
 __Attention:__
 Make sure your settings are configured correctly after a firmware upgrade! Non-volatile-memory might have been overwritten by the update.
 
+## Simulating sensors
+
+Instead of the speed sensor, a function generator with ca. 3V amplitude, square signal at a few hundred Hz can be used.
+
+For the transducer, I have no good benchtop solution. On one ClipperDuet device, it suffices to put a finger across the sensor port to get some readings, but a different one is rather immune against this trick. Beware of shock!
+
 ## Implementation insights
 
 The PIC microcontroller of the Clipper Duet tells the HT1621 LCD controller which segments should be on depending on the values to be displayed.
