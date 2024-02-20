@@ -8,6 +8,13 @@ __ClipperDuet2N2k__ project is about retrofitting[^1] a NASAmarine Clipper Duet 
 
 It makes use of an ESP32 equipped with a CAN transceiver to read the LCD controller's data and recompute usable values for water depth, speed and distance logs to be send into the NMEA2000 CAN network.
 
+A small "in action" photo with the ClipperDuet2N2k connected to a Raymarine display, and CANable PC adapter:
+![ClipperDuet2N2k front side](./doc/photo_front_complete.jpg)
+
+On the back side, there are two additional cables for the NMEA2000 CAN bus wired through the existing cable port.
+This build also has a USB-C socket for serial communications with the ESP32 module, and as an alternative to the OTA firmware update via WIFI:
+![ClipperDuet2N2k back side](./doc/photo_back_complete.jpg)
+
 See my chaotic test setup[^2] below:
 ![Test setup showing Clipper Duet connected to NMEA2000 bus](./doc/testsetup.jpg)
 
@@ -47,17 +54,31 @@ It is unknown if there are different hardware revisions of the Clipper Duet arou
 
 The firmware expects these connections (Arduino style pin numbering):
 
-* GPIO_NUM_12 (SPI MOSI) to HT1621 DATA which is on pin 4 of the PIC
-* GPIO_NUM_13 (SPI MISO) stays unconnected
-* GPIO_NUM_14 (SPI CLK) to HT1621 WR which is pin 5 of the PIC
-* GPIO_NUM_27 (SPI CS) to HT1621 CS which is pin 7 on the PIC
-* GND of the ESP32 is connected to GND on the Clipper Duet, this can be found e.g. on pin 8 of the PIC
-* CAN transceiver TX pin is on GPIO_NUM_5 of the ESP32
-* CAN transceiver RX pin is on GPIO_NUM_4 of the ESP32
+| ESP32 GPIO | ClipperDuet | function / comment |
+| -- | -- | -- |
+| GPIO_NUM_12 (SPI MOSI) | PIC µC pin 4 | HT1621 DATA |
+| GPIO_NUM_13 (SPI MISO) |  unconnected | must exist due to SPI implementation |
+| GPIO_NUM_14 (SPI CLK) | PIC µC pin 5 | HT1621 WR |
+| GPIO_NUM_27 (SPI CS) | PIC µC pin 7 | HT1621 CS |
+| GPIO_NUM_5 | CAN TX | CAN transceiver[^3] |
+| GPIO_NUM_4 | CAN RX | CAN transceiver[^3] |
+| GPIO_NUM_4 | CAN RX | CAN transceiver[^3] |
+| GND | PIC µC pin 8 | use any convenient GND connection |
+| 5V | PIC µC pin 1 | use any convenient 5V connection |
 
 The ESP32 is experienced to have 5V tolerance on the GPIO pins above. Considering the cheapness of the ESP32 modules, there is no level converter used.
 
+![Lolin32 board connected](./doc/photo_lolin32.jpg)
+
+I used cheap "Lolin32" ESP32 boards, as these were quite slim with a thin PCB. If you plan to remove the USB header, make sure to have your board programmed beforehand. Subsequent updates can be made OTA via WIFI.
+
 A power supply for the ESP32 is needed. Most ESP32 modules want either 3.3V or 5V. The on-board 5V regulator of the Clipper Duet should not be used, as the ESP32 could draw too much power even without WIFI - YMMV.
+
+On my builds, I removed the on-board 78L05 (TO-92 footprint) regulator and installed a more powerful 7805 with TO-220 footprint on the other side of the ClipperDuet PCB. This modification made room for the ESP32 board to fit between the backlight and the PCB.
+
+![Lolin32 board sandwiched between backlight and front PCB of the ClipperDuet](./doc/photo_lolin32_sandwich.jpg)
+
+See also [doc/](./doc/) directory for more pictures,
 
 ### First start
 
