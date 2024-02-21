@@ -37,6 +37,9 @@
 #define NMEA0183_RXD GPIO_NUM_0
 #define NMEA0183_SPEED 4800
 
+#define NMEA2K_FORWARD_SERIAL Serial
+#define NMEA0183_FORWARD_SERIAL Serial2
+
 // define if OTA updates via WIFI should be enabled
 #define WITH_OTA
 
@@ -107,6 +110,7 @@ ESP32SPISlave slave;
 #include <NMEA0183Msg.h>
 #include <NMEA0183Messages.h>
 tNMEA0183 NMEA0183_Out;
+
 
 // TODO: adjust buffer size
 static constexpr uint32_t BUFFER_SIZE{36};
@@ -559,7 +563,7 @@ void InitNMEA2000()
 #ifdef DEBUG
   NMEA2000.SetForwardType(tNMEA2000::fwdt_Text); // Show in clear text instead of Actisense format.
 #endif
-  NMEA2000.SetForwardStream(&Serial);
+  NMEA2000.SetForwardStream(&NMEA2K_FORWARD_SERIAL);
   NMEA2000.SetMode(tNMEA2000::N2km_ListenAndNode, 32);
   NMEA2000.EnableForward(true);
 
@@ -620,11 +624,11 @@ void setup()
   clipperdata.shallow_alarm = preferences.getDouble("shallow_alarm", 0.0);
   clipperdata.speed_alarm = preferences.getDouble("speed_alarm", 0.0);
 
-  Serial.begin(115200);
+  NMEA2K_FORWARD_SERIAL.begin(115200);
   InitNMEA2000();
 
-  Serial2.begin(NMEA0183_SPEED, NMEA0183_RXD, NMEA0183_TXD);
-  NMEA0183_Out.SetMessageStream(&Serial2);
+  NMEA0183_FORWARD_SERIAL.begin(NMEA0183_SPEED, NMEA0183_RXD, NMEA0183_TXD);
+  NMEA0183_Out.SetMessageStream(&NMEA0183_FORWARD_SERIAL);
   NMEA0183_Out.Open();
 
   printf("\n\nClipperDuet2N2k %s\n\n", GIT_DESCRIBE);
@@ -1041,13 +1045,13 @@ void loop()
   }
 
   // Dummy to empty serial input buffer
-  if (Serial.available())
+  if (NMEA2K_FORWARD_SERIAL.available())
   {
-    Serial.read();
+    NMEA2K_FORWARD_SERIAL.read();
   }
-  if (Serial2.available())
+  if (NMEA0183_FORWARD_SERIAL.available())
   {
-    Serial2.read();
+    NMEA0183_FORWARD_SERIAL.read();
   }
 #ifdef WITH_OTA
   if (wifiusage == 1)
