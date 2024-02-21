@@ -1058,7 +1058,7 @@ void loop()
     slave.pop();
   }
 
-  // Dummy to empty serial input buffer
+  // Dummy to empty serial input buffers
   if (NMEA2K_FORWARD_SERIAL.available())
   {
     NMEA2K_FORWARD_SERIAL.read();
