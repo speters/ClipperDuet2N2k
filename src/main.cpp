@@ -16,20 +16,36 @@
  the Trip record is considered invalid and therefore no distance log values are sent      Cancel changes
 
  */
+#ifndef DISTANCE_TIMEOUT
 #define DISTANCE_TIMEOUT 60
+#endif
 // Consider this a safe sensor to keel distance (in m) in case the offset has not been read from the device
 // This is a positive value
+#ifndef SAFE_OFFSET
 #define SAFE_OFFSET 3
+#endif
 
 // Pin mappings for LCD data lines to SPI pins of the ESP32
+#ifndef PIN_HTDATA
 #define PIN_HTDATA GPIO_NUM_12    // HT1621 DATA is SPI MOSI on our ESP32 SPI Slave implementation
+#endif
+#ifndef PIN_HTDATAOUT
 #define PIN_HTDATAOUT GPIO_NUM_13 // unused, but must a usable pin for SPI MISO
+#endif
+#ifndef PIN_HTCLK
 #define PIN_HTCLK GPIO_NUM_14     // HT1621 WR is SPI Clk on our ESP32 SPI Slave implementation
+#endif
+#ifndef PIN_HTCS
 #define PIN_HTCS GPIO_NUM_27      // HT1621 CS is SPI CS on our ESP32 SPI Slave implementation
+#endif
 
 // Pins where the CAN bus transceiver is attached
+#ifndef ESP32_CAN_TX_PIN
 #define ESP32_CAN_TX_PIN GPIO_NUM_5
+#endif
+#ifndef ESP32_CAN_RX_PIN
 #define ESP32_CAN_RX_PIN GPIO_NUM_4
+#endif
 
 #define NMEA0183_SPEED 4800
 
@@ -53,7 +69,9 @@
 #endif
 
 // define if OTA updates via WIFI should be enabled
+#ifndef WITHOUT_OTA
 #define WITH_OTA
+#endif
 
 // Older Platformio ESP32 versions need this
 // TODO: specify exact version
