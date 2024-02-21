@@ -41,10 +41,16 @@
 #define SERIAL2_RXD (-1)
 #endif
 
+
+#ifndef NMEA0183_FIRST
 // Defines which serial port is used to forward data.
 // "Serial" is usually routed to a USB-serial-converter on many ESP32 boards
 #define NMEA2K_FORWARD_SERIAL Serial
 #define NMEA0183_FORWARD_SERIAL Serial2
+#else
+#define NMEA2K_FORWARD_SERIAL Serial2
+#define NMEA0183_FORWARD_SERIAL Serial
+#endif
 
 // define if OTA updates via WIFI should be enabled
 #define WITH_OTA
