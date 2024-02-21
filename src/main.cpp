@@ -47,7 +47,15 @@
 #define ESP32_CAN_RX_PIN GPIO_NUM_4
 #endif
 
+// speed ("baud rate") for the NME0183 output (usually 4800 or 38400 bps)
+#ifndef NMEA0183_SPEED
 #define NMEA0183_SPEED 4800
+#endif
+
+// speed of the serial NMEA2k forwarding in Actisense format (usually 115200 bps)
+#ifndef ACTISENSE_SPEED
+#define ACTISENSE_SPEED 115200
+#endif
 
 // Pins for 2nd serial, use defaults of HardwareSerial.h
 #ifndef SERIAL2_TXD
@@ -56,7 +64,6 @@
 #ifndef SERIAL2_RXD
 #define SERIAL2_RXD (-1)
 #endif
-
 
 #ifndef NMEA0183_FIRST
 // Defines which serial port is used to forward data.
@@ -655,9 +662,9 @@ void setup()
   clipperdata.speed_alarm = preferences.getDouble("speed_alarm", 0.0);
 
   if (NMEA2K_FORWARD_SERIAL == Serial2) {
-      NMEA2K_FORWARD_SERIAL.begin(NMEA0183_SPEED, SERIAL2_RXD, SERIAL2_TXD);
+      NMEA2K_FORWARD_SERIAL.begin(ACTISENSE_SPEED, SERIAL2_RXD, SERIAL2_TXD);
   } else {
-    NMEA2K_FORWARD_SERIAL.begin(115200);
+    NMEA2K_FORWARD_SERIAL.begin(ACTISENSE_SPEED);
   }
   InitNMEA2000();
 
