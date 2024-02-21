@@ -1045,6 +1045,10 @@ void loop()
   {
     Serial.read();
   }
+  if (Serial2.available())
+  {
+    Serial2.read();
+  }
 #ifdef WITH_OTA
   if (wifiusage == 1)
   {
