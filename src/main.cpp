@@ -31,6 +31,12 @@
 #define ESP32_CAN_TX_PIN GPIO_NUM_5
 #define ESP32_CAN_RX_PIN GPIO_NUM_4
 
+// Pins for NMEA0183 serial
+#define NMEA0183_TXD GPIO_NUM_17
+// No need for RX, so delegate to otherwise useless GPIO 0
+#define NMEA0183_RXD GPIO_NUM_0
+#define NMEA0183_SPEED 4800
+
 // define if OTA updates via WIFI should be enabled
 #define WITH_OTA
 
@@ -95,6 +101,12 @@
 
 Preferences preferences;
 ESP32SPISlave slave;
+
+#include <HardwareSerial.h>
+#include <NMEA0183.h>
+#include <NMEA0183Msg.h>
+#include <NMEA0183Messages.h>
+tNMEA0183 NMEA0183_Out;
 
 // TODO: adjust buffer size
 static constexpr uint32_t BUFFER_SIZE{36};
@@ -216,17 +228,28 @@ void buf2clipperlcd()
  returns int on success with the int value 10 times of the value being shown to account for the decimal separator,
  returns N2kUInt32NA (0xffffffff) on conversion error
  */
-uint32_t digits2int(const uint8_t d1, const uint8_t d2, const uint8_t d3, bool dot)
+uint32_t digits2int(const uint8_t d0, const uint8_t d1, const uint8_t d2, const uint8_t d3, bool dot)
 {
   int x = N2kUInt32NA;
 
+  if (d0 >= '0' && d0 <= '9')
+  {
+    x = d0 - '0';
+    x *= 10;
+  }
+
   if (d1 == ' ')
   {
-    x = 0.0;
+    // Accept reset to 0 when this digit is blank, as digit 0 would be something like a status indicator, not contributing to the int 
+    x = 0;
   }
   else if (d1 >= '0' && d1 <= '9')
   {
-    x = d1 - '0';
+    if (x == N2kUInt32NA) {
+      x = d1 - '0';
+    } else {
+      x += d1 - '0';
+    }
     x *= 10;
   }
   else
@@ -269,7 +292,8 @@ uint32_t digits2int(const uint8_t d1, const uint8_t d2, const uint8_t d3, bool d
 */
 double rowa2double()
 {
-  uint32_t val = digits2int(clipperlcd.digit1, clipperlcd.digit2, clipperlcd.digit3, ((clipperlcd.info2 & (1 << 5)) == (1 << 5)));
+  uint32_t val = digits2int(clipperlcd.digit0, clipperlcd.digit1, clipperlcd.digit2, clipperlcd.digit3, ((clipperlcd.info2 & (1 << 5)) == (1 << 5)));
+  
   if (val != N2kUInt32NA)
   {
     return ((double)val) / 10.0;
@@ -285,7 +309,7 @@ double rowa2double()
 */
 double rowb2double()
 {
-  uint32_t val = digits2int(clipperlcd.digit4, clipperlcd.digit5, clipperlcd.digit6, ((clipperlcd.info2 & (1 << 4)) == (1 << 4)));
+  uint32_t val = digits2int(' ', clipperlcd.digit4, clipperlcd.digit5, clipperlcd.digit6, ((clipperlcd.info2 & (1 << 4)) == (1 << 4)));
   if (val != N2kUInt32NA)
   {
     return ((double)val) / 10.0;
@@ -546,6 +570,16 @@ void InitNMEA2000()
   NMEA2000.Open();
 }
 
+bool NMEA0183SetVLW(tNMEA0183Msg &NMEA0183Msg, double TotalLog, double TripLog, const char *Src = "II")
+{
+  if (!NMEA0183Msg.Init("VLW", Src)) return false;
+  if (!NMEA0183Msg.AddDoubleField(TotalLog / 1852.0)) return false;
+  if (!NMEA0183Msg.AddStrField("N")) return false;
+  if (!NMEA0183Msg.AddDoubleField(TripLog / 1852.0)) return false;
+  if (!NMEA0183Msg.AddStrField("N")) return false;
+  return true;
+}
+
 #ifdef WITH_OTA
 DNSServer dnsServer;
 AsyncWebServer server(80);
@@ -589,6 +623,10 @@ void setup()
   Serial.begin(115200);
   InitNMEA2000();
 
+  Serial2.begin(NMEA0183_SPEED, NMEA0183_RXD, NMEA0183_TXD);
+  NMEA0183_Out.SetMessageStream(&Serial2);
+  NMEA0183_Out.Open();
+
   printf("\n\nClipperDuet2N2k %s\n\n", GIT_DESCRIBE);
 
   slave.setDataMode(SPI_MODE3);
@@ -608,6 +646,7 @@ const uint32_t BF_SPEED_ALARM = 1 << 4;
 
 uint32_t queue_save = 0;
 tN2kMsg N2kMsg;
+tNMEA0183Msg NMEA0183Msg;
 
 void loop()
 {
@@ -717,6 +756,9 @@ void loop()
           SetN2kWaterDepth(N2kMsg, SID, clipperdata.depth, clipperdata.offset, N2kDoubleNA); // TODO: send proper Range instead of N2kDoubleNA
           NMEA2000.SendMsg(N2kMsg);
 
+          NMEA0183SetDPT(NMEA0183Msg, clipperdata.depth, clipperdata.offset);
+          NMEA0183_Out.SendMessage(NMEA0183Msg);
+
           double speed = N2kDoubleNA;
           double distance = -1;
 
@@ -756,6 +798,9 @@ void loop()
 
             SetN2kBoatSpeed(N2kMsg, SID, clipperdata.speed, N2kDoubleNA, N2kSWRT_Paddle_wheel);
             NMEA2000.SendMsg(N2kMsg);
+
+            NMEA0183SetVHW(NMEA0183Msg, NMEA0183DoubleNA, NMEA0183DoubleNA, clipperdata.speed);
+            NMEA0183_Out.SendMessage(NMEA0183Msg);
 
             DEBUG_PRINT("Speed: %fm/s, Depth: %fm\n", clipperdata.speed, clipperdata.depth);
           }
@@ -799,6 +844,9 @@ void loop()
                 SetN2kDistanceLog(N2kMsg, DaysSince1970, SecondsSinceMidnight, clipperdata.total, clipperdata.trip);
                 NMEA2000.SendMsg(N2kMsg);
 
+                NMEA0183SetVLW(NMEA0183Msg, clipperdata.total, clipperdata.trip);
+                NMEA0183_Out.SendMessage(NMEA0183Msg);
+
                 DEBUG_PRINT("Trip: %fm, Total: %fm, DaysSince1970: %u, SecondsSinceMidnight: %f\n", clipperdata.trip, clipperdata.total, DaysSince1970, SecondsSinceMidnight);
               }
               else if ((clipperlcd.info1 & 0b01000000) == 0b01000000)
@@ -812,6 +860,10 @@ void loop()
                   // Trip and total distanca data are within the DISTANCE_TIMOUT, so good to send both
                   SetN2kDistanceLog(N2kMsg, DaysSince1970, SecondsSinceMidnight, clipperdata.total, clipperdata.trip);
                   NMEA2000.SendMsg(N2kMsg);
+
+                  NMEA0183SetVLW(NMEA0183Msg, clipperdata.total, clipperdata.trip);
+                  NMEA0183_Out.SendMessage(NMEA0183Msg);
+
                   DEBUG_PRINT("Total: %fm, Trip: %fm, DaysSince1970: %u, SecondsSinceMidnight: %f\n", clipperdata.total, clipperdata.trip, DaysSince1970, SecondsSinceMidnight);
                 }
                 else
