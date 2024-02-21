@@ -31,11 +31,15 @@
 #define ESP32_CAN_TX_PIN GPIO_NUM_5
 #define ESP32_CAN_RX_PIN GPIO_NUM_4
 
-// Pins for 2nd serial
-#define SERIAL2_TXD GPIO_NUM_17
-// No need for RX, so delegate to otherwise useless GPIO 0
-#define SERIAL2_RXD GPIO_NUM_0
 #define NMEA0183_SPEED 4800
+
+// Pins for 2nd serial, use defaults of HardwareSerial.h
+#ifndef SERIAL2_TXD
+#define SERIAL2_TXD (-1)
+#endif
+#ifndef SERIAL2_RXD
+#define SERIAL2_RXD (-1)
+#endif
 
 // Defines which serial port is used to forward data.
 // "Serial" is usually routed to a USB-serial-converter on many ESP32 boards
