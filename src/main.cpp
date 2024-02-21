@@ -31,12 +31,14 @@
 #define ESP32_CAN_TX_PIN GPIO_NUM_5
 #define ESP32_CAN_RX_PIN GPIO_NUM_4
 
-// Pins for NMEA0183 serial
-#define NMEA0183_TXD GPIO_NUM_17
+// Pins for 2nd serial
+#define SERIAL2_TXD GPIO_NUM_17
 // No need for RX, so delegate to otherwise useless GPIO 0
-#define NMEA0183_RXD GPIO_NUM_0
+#define SERIAL2_RXD GPIO_NUM_0
 #define NMEA0183_SPEED 4800
 
+// Defines which serial port is used to forward data.
+// "Serial" is usually routed to a USB-serial-converter on many ESP32 boards
 #define NMEA2K_FORWARD_SERIAL Serial
 #define NMEA0183_FORWARD_SERIAL Serial2
 
@@ -624,10 +626,18 @@ void setup()
   clipperdata.shallow_alarm = preferences.getDouble("shallow_alarm", 0.0);
   clipperdata.speed_alarm = preferences.getDouble("speed_alarm", 0.0);
 
-  NMEA2K_FORWARD_SERIAL.begin(115200);
+  if (NMEA2K_FORWARD_SERIAL == Serial2) {
+      NMEA2K_FORWARD_SERIAL.begin(NMEA0183_SPEED, SERIAL2_RXD, SERIAL2_TXD);
+  } else {
+    NMEA2K_FORWARD_SERIAL.begin(115200);
+  }
   InitNMEA2000();
 
-  NMEA0183_FORWARD_SERIAL.begin(NMEA0183_SPEED, NMEA0183_RXD, NMEA0183_TXD);
+  if (NMEA0183_FORWARD_SERIAL == Serial2) {
+    NMEA0183_FORWARD_SERIAL.begin(NMEA0183_SPEED, SERIAL2_RXD, SERIAL2_TXD);
+  } else {
+    NMEA0183_FORWARD_SERIAL.begin(NMEA0183_SPEED);
+  }
   NMEA0183_Out.SetMessageStream(&NMEA0183_FORWARD_SERIAL);
   NMEA0183_Out.Open();
 
