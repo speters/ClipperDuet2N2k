@@ -62,7 +62,6 @@ The firmware expects these connections (Arduino style pin numbering):
 | GPIO_NUM_27 (SPI CS) | PIC µC pin 7 | HT1621 CS |
 | GPIO_NUM_5 | CAN TX | CAN transceiver[^3] |
 | GPIO_NUM_4 | CAN RX | CAN transceiver[^3] |
-| GPIO_NUM_4 | CAN RX | CAN transceiver[^3] |
 | GND | PIC µC pin 8 | use any convenient GND connection |
 | 5V | PIC µC pin 1 | use any convenient 5V connection |
 
